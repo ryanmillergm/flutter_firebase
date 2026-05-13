@@ -62,39 +62,50 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data!.docs.length,
                   // index loop position number
                   itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: TaskCard(
-                            // hexToColor converts the hex fromt he string ex/ "000000"
-                            color: hexToColor(snapshot.data!.docs[index].data()['color']),
-                            // Get the doc by index and retrieve data like title
-                            headerText: snapshot.data!.docs[index].data()['title'],
-                            descriptionText: snapshot.data!.docs[index].data()['description'],
-                            scheduledDate: snapshot.data!.docs[index].data()['date'].toString(),
-                          ),
-                        ),
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: strengthenColor(
-                              const Color.fromRGBO(246, 222, 194, 1),
-                              0.69,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Text(
-                            '10:00AM',
-                            style: TextStyle(
-                              fontSize: 17,
+                    return Dismissible(
+                      key: ValueKey(index),
+                      onDismissed: (direction) {
+                        if(direction == DismissDirection.endToStart) {
+                          await FirebaseFirestore.instance
+                          .collection("tasks")
+                          .doc(snapshot.data!.docs[index].id)
+                          .delete();
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TaskCard(
+                              // hexToColor converts the hex fromt he string ex/ "000000"
+                              color: hexToColor(snapshot.data!.docs[index].data()['color']),
+                              // Get the doc by index and retrieve data like title
+                              headerText: snapshot.data!.docs[index].data()['title'],
+                              descriptionText: snapshot.data!.docs[index].data()['description'],
+                              scheduledDate: snapshot.data!.docs[index].data()['date'].toString(),
                             ),
                           ),
-                        )
-                      ],
+                          Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: strengthenColor(
+                                const Color.fromRGBO(246, 222, 194, 1),
+                                0.69,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Text(
+                              '10:00AM',
+                              style: TextStyle(
+                                fontSize: 17,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
                     );
                   },
                 ),
