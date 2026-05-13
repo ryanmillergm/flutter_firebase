@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_tutorial/utils.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class _AddNewTaskState extends State<AddNewTask> {
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
         "date": selectedDate,
+        "creator": FirebaseAuth.instance.currentUser!.uid, 
         "postedAt": FieldValue.serverTimestamp(),
         "color": rgbToHex(_selectedColor),
       });
