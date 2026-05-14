@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       key: ValueKey(index),
                       onDismissed: (direction) {
                         if(direction == DismissDirection.endToStart) {
-                          await FirebaseFirestore.instance
+                          FirebaseFirestore.instance
                           .collection("tasks")
                           .doc(snapshot.data!.docs[index].id)
                           .delete();
