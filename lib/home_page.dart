@@ -92,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 const Color.fromRGBO(246, 222, 194, 1),
                                 0.69,
                               ),
+                              image: snapshot.data!.docs[index].data()['imageURL'] == null ? null : DecorationImage(image: NetworkImage(snapshot.data!.docs[index].data()['imageURL'])),
                               shape: BoxShape.circle,
                             ),
                           ),

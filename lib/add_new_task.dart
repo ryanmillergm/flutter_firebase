@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_tutorial/utils.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,16 @@ class _AddNewTaskState extends State<AddNewTask> {
 
   Future<void> uploadTaskToDb() async {
     try {
+      // ref the origin point of the folder and child is path used in firebase storage: /images/${id}
       final id = const Uuid().v4();
+      final imagesRef = FirebaseStorage.instance.ref('images').child(id);
+
+      final uploadTask = imagesRef.putFile(file!);
+      final taskSnapshot = await uploadTask;
+      
+      final imageURL = await taskSnapshot.ref.getDownloadURL();
+      print(imageURL);
+
       await FirebaseFirestore.instance.collection("tasks").doc(id).set({
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
@@ -39,6 +49,7 @@ class _AddNewTaskState extends State<AddNewTask> {
         "creator": FirebaseAuth.instance.currentUser!.uid, 
         "postedAt": FieldValue.serverTimestamp(),
         "color": rgbToHex(_selectedColor),
+        "imageURL": imageURL,
       });
       print(id);
     } catch (e) {
@@ -81,37 +92,37 @@ class _AddNewTaskState extends State<AddNewTask> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              // UNCOMMENT THIS in Firebase Storage section!
 
-              // GestureDetector(
-              //   onTap: () async {
-              //     final image = await selectImage();
-              //     setState(() {
-              //       file = image;
-              //     });
-              //   },
-              //   child: DottedBorder(
-              //     borderType: BorderType.RRect,
-              //     radius: const Radius.circular(10),
-              //     dashPattern: const [10, 4],
-              //     strokeCap: StrokeCap.round,
-              //     child: Container(
-              //       width: double.infinity,
-              //       height: 150,
-              //       decoration: BoxDecoration(
-              //         borderRadius: BorderRadius.circular(10),
-              //       ),
-              //       child: file != null
-              //           ? Image.file(file!)
-              //           : const Center(
-              //               child: Icon(
-              //                 Icons.camera_alt_outlined,
-              //                 size: 40,
-              //               ),
-              //             ),
-              //     ),
-              //   ),
-              // ),
+              // Image uploader & selector
+              GestureDetector(
+                onTap: () async {
+                  final image = await selectImage();
+                  setState(() {
+                    file = image;
+                  });
+                },
+                child: DottedBorder(
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(10),
+                  dashPattern: const [10, 4],
+                  strokeCap: StrokeCap.round,
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: file != null
+                        ? Image.file(file!)
+                        : const Center(
+                            child: Icon(
+                              Icons.camera_alt_outlined,
+                              size: 40,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: titleController,
